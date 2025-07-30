@@ -1,13 +1,23 @@
 import express from 'express'
+import { config } from 'dotenv'
+import pg from 'pg'
+
+config()
 
 const app = express()
 
-app.get('/',(req,res)=>{
-    res.send('Hellow World')
+const pool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl : true
 })
 
-app.use((req, res)=>{
-    res.end('<a href="/"> Ir al Inicio</a>')
+app.get('/',(req,res)=>{
+    res.send('Hola Mundo')
+})
+
+app.get('/ping',async (req,res)=>{
+    const result = await pool.query('SELECT NOW()')
+    return res.json(result.rows[0])
 })
 
 app.listen(3000)
